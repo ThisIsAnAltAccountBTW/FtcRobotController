@@ -32,6 +32,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -91,6 +94,7 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
                 }
 
                 // Share the CPU.
+                //IMPORTANT----TO INCREASE DETECTION PERFORMANCE, DECREASE CPU SLEEP SHARE!!!!
                 sleep(20);
             }
         }
@@ -103,6 +107,7 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
     /**
      * Initialize the AprilTag processor.
      */
+
     private void initAprilTag() {
 
         // Create the AprilTag processor the easy way.
@@ -111,7 +116,6 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
-                    telemetry.update()
                     hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
         } else {
             visionPortal = VisionPortal.easyCreateWithDefaults(
@@ -119,7 +123,8 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
         }
 
     }   // end method initAprilTag()
-
+    private DcMotor         leftDrive   = null;
+    Servo                   servo;
     /**
      * Add telemetry about AprilTag detections.
      */
@@ -130,12 +135,42 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
+
             if (detection.metadata != null) {
+                leftDrive  = hardwareMap.get(DcMotor.class, "motor 1");
+                leftDrive.setPower(2);
+                if (detection.ftcPose.x >=0){
+                    leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+                    leftDrive.setPower(2);
+                }
+                if(detection.ftcPose.x <0){
+                    leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+                    leftDrive.setPower(2);
+                }
+                while(detection.ftcPose.z > 5){
+                    leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+                    leftDrive.setPower(2);
+                    //SERVO TESTING
+                    servo = hardwareMap.get(Servo.class, "servo 1");
+                }
+                while(detection.ftcPose.z < 2){
+                    leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+                    leftDrive.setPower(2);
+                }
+                while(gamepad1.right_trigger > 0.2){
+                    leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+                    leftDrive.setPower(2);
+                }
+                while(gamepad1.left_trigger > 0.2){
+                    leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+                    leftDrive.setPower(2);
+                }
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
+                leftDrive.setPower(0);
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
