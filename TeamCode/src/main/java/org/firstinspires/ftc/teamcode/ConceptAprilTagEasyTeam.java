@@ -29,12 +29,16 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.hardware.Sensor;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -54,7 +58,8 @@ import java.util.List;
 @TeleOp(name = "Concept: AprilTag Easy", group = "Concept")
 //@Disabled
 public class ConceptAprilTagEasyTeam extends LinearOpMode {
-
+    TouchSensor touch;
+    ColorSensor color;
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     /**
@@ -77,7 +82,9 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
         waitForStart();
-
+        leftDrive  = hardwareMap.get(DcMotor.class, "motor 1");
+        touch = hardwareMap.get(TouchSensor.class, "Touch 1");
+        color = hardwareMap.get(ColorSensor.class, "Color Sensor 1");
         if (opModeIsActive()) {
             while (opModeIsActive()) {
 
@@ -92,7 +99,13 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
                 } else if (gamepad1.dpad_up) {
                     visionPortal.resumeStreaming();
                 }
-
+                while(touch.isPressed() && opModeIsActive()){
+                    leftDrive.setPower(2);
+                    telemetry.addData("Red", color.red());
+                    telemetry.addData("Green", color.green());
+                    telemetry.addData("Blue", color.blue());
+                    telemetry.update();
+                }
                 // Share the CPU.
                 //IMPORTANT----TO INCREASE DETECTION PERFORMANCE, DECREASE CPU SLEEP SHARE!!!!
                 sleep(20);
@@ -137,7 +150,7 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
         for (AprilTagDetection detection : currentDetections) {
 
             if (detection.metadata != null) {
-                leftDrive  = hardwareMap.get(DcMotor.class, "motor 1");
+
                 leftDrive.setPower(2);
                 if (detection.ftcPose.x >=0){
                     leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
