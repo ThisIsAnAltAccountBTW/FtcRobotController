@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.backups;
 
 import android.hardware.Sensor;
 
@@ -56,6 +56,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
 @TeleOp(name = "Concept: AprilTag Easy", group = "Concept")
+@Disabled
 //@Disabled
 public class ConceptAprilTagEasyTeam extends LinearOpMode {
     TouchSensor touch;
@@ -99,13 +100,7 @@ public class ConceptAprilTagEasyTeam extends LinearOpMode {
                 } else if (gamepad1.dpad_up) {
                     visionPortal.resumeStreaming();
                 }
-                while(touch.isPressed() && opModeIsActive()){
-                    leftDrive.setPower(2);
-                    telemetry.addData("Red", color.red());
-                    telemetry.addData("Green", color.green());
-                    telemetry.addData("Blue", color.blue());
-                    telemetry.update();
-                }
+
                 // Share the CPU.
                 //IMPORTANT----TO INCREASE DETECTION PERFORMANCE, DECREASE CPU SLEEP SHARE!!!!
                 sleep(20);
